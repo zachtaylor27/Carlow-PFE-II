@@ -1,9 +1,191 @@
--> Data 
-      -> poke.csv
-->Q1
-      -> main.py
-->Q2
-      -> main.py
-  ...
-->Q10
-      -> main.py
+import csv
+import random
+
+# Save to file (chat gpt was used as a tool for this part)
+def save_to_file(filename, content):
+    with open(filename, "w") as file:
+        if isinstance(content, list):
+            file.write("\n".join(content))
+        else:
+            file.write(content)
+
+# Load Pokémon data from file
+def load_pokemon_data(filepath):
+    try:
+        with open(filepath, "r") as file:
+            reader = csv.reader(file)
+            next(reader)  # Skip header
+            return {row[1].lower(): row[0] for row in reader if row}
+    except FileNotFoundError:
+        print(f"Error: Pokémon data file '{filepath}' not found.")
+        return {}
+
+# Q1
+name = input("Enter your name: ")
+greeting = f"Hello, {name}"
+print(greeting)
+save_to_file("q1.out", greeting)
+
+# Q2
+while True:
+    try:
+        age = int(input("Enter your age: ").strip())
+        break
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+
+with open("q2.out", "w") as file:
+    file.write(f"Age entered: {age}\n")
+    file.write(f"Age in 5 years: {age + 5}\n")
+
+print("Data written to q2.out")
+
+# Q3
+while True:
+    try:
+        age = int(input("Enter your age: ").strip())
+        break
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+
+result = "fail" if age < 20 or age > 30 else "pass"
+
+save_to_file("q3.out", result)
+print(f"Result written to q3.out: {result}")
+
+# Q4
+students = []
+while True:
+    name = input("Enter a student's name (or 'exit' to stop): ").strip()
+    if name.lower() == "exit":
+        break
+    students.append(name)
+
+save_to_file("q4.out", "\n".join(students))
+print("Student list saved to q4.out")
+
+# Q5
+students = []
+while True:
+    print("\n1) Enter user\n2) Exit")
+    choice = input("Choose an option: ").strip()
+
+    if choice == "1":
+        name = input("Enter a student's name: ").strip()
+        students.append(name)
+    elif choice == "2":
+        break
+    else:
+        print("Invalid option, try again.")
+
+save_to_file("q5.out", "\n".join(students))
+print("Student list saved to q5.out")
+
+# Q6
+pokemon_name = input("Enter a Pokémon name: ").strip().lower()
+
+try:
+    with open("../Data/poke.csv", "r") as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header
+        found = False
+
+        with open("q6.out", "w") as output:
+            for row in reader:
+                if row and row[1].lower() == pokemon_name:
+                    output.write(f"{row[0]}, {row[1]}\n")
+                    found = True
+                    break
+
+    print("Pokémon found. Data saved to q6.out" if found else "Pokémon not found.")
+except FileNotFoundError:
+    print("Error: Pokémon data file not found.")
+
+# Q7
+team = []
+MAX_TEAM_SIZE = 6
+
+pokemon_data = load_pokemon_data("../Data/poke.csv")
+
+while len(team) < MAX_TEAM_SIZE:
+    name = input("Enter Pokémon (or 'exit' to finish): ").strip().lower()
+    
+    if name == "exit":
+        break
+    elif name in pokemon_data:
+        team.append((pokemon_data[name], name.title()))
+        print(f"Added {name.title()} to the team.")
+    else:
+        print("Pokémon not found.")
+
+save_to_file("q7.out", "\n".join(f"{p[0]}, {p[1]}" for p in team))
+print("Team saved to q7.out")
+
+# Q8
+team = {}
+MAX_TEAM_SIZE = 6
+
+pokemon_data = load_pokemon_data("../Data/poke.csv")
+
+try:
+    with open("../Data/locations.csv", "r") as file:
+        locations = {row[0]: row[1] for row in csv.reader(file) if row}
+except FileNotFoundError:
+    locations = {}
+
+while len(team) < MAX_TEAM_SIZE:
+    name = input("Enter Pokémon (or 'exit' to finish): ").strip().lower()
+    
+    if name == "exit":
+        break
+    elif name in pokemon_data:
+        pid = pokemon_data[name]
+        team[pid] = (name.title(), locations.get(pid, "Unknown"))
+        print(f"Added {name.title()} (Location: {team[pid][1]})")
+    else:
+        print("Pokémon not found.")
+
+save_to_file("q8.out", "\n".join(f"{pid}, {name}, {location}" for pid, (name, location) in team.items()))
+print("Team saved to q8.out")
+
+# Q9
+team = []
+MAX_TEAM_SIZE = 6
+pokemon_data = load_pokemon_data("../Data/poke.csv")
+
+while True:
+    print("\n1) Add Pokémon\n2) List Team\n3) Drop Member\n4) Exit")
+    choice = input("Choose an option: ").strip()
+
+    if choice == "1":
+        if len(team) < MAX_TEAM_SIZE:
+            name = input("Enter Pokémon name: ").strip().lower()
+            if name in pokemon_data:
+                team.append((pokemon_data[name], name.title()))
+                print(f"Added {name.title()}")
+            else:
+                print("Pokémon not found.")
+        else:
+            print("Team is full!")
+
+    elif choice == "2":
+        print("\nCurrent Team:")
+        for i, p in enumerate(team, 1):
+            print(f"{i}) {p[1]}")
+
+    elif choice == "3":
+        try:
+            idx = int(input("Enter team number to remove: ")) - 1
+            if 0 <= idx < len(team):
+                removed = team.pop(idx)
+                print(f"Removed {removed[1]}")
+            else:
+                print("Invalid selection.")
+        except ValueError:
+            print("Invalid input. Enter a number.")
+
+    elif choice == "4":
+        break
+
+save_to_file("q9.out", "\n".join(f"{p[0]}, {p[1]}" for p in team))
+print("Team saved to q9.out")
