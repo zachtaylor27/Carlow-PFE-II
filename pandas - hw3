@@ -10,10 +10,7 @@ locations_file = os.path.join(data_path, "locations.csv")
 def q1():
     # list users and scores and convert to datframe
     data = [
-        ("Zach", 20), ("Wyatt", 17), ("Carter", 48),
-        ("Cat", 92), ("Zyannah", 55), ("Dani", 63),
-        ("Tyler", 43), ("Jeremy", 23), ("Sam", 79),
-        ("Zane", 21)
+        ("Zach", 20), ("Wyatt", 17), ("Carter", 48), ("Cat", 92), ("Zyannah", 55), ("Dani", 63), ("Tyler", 43), ("Jeremy", 23), ("Sam", 79), ("Zane", 21)
     ]
     df = pd.DataFrame(data, columns=["Name", "Score"])
     print(df["Name"].to_string(index=False))
@@ -42,7 +39,7 @@ def q2_q4():
             break
 
 def q5():
-    # Print parameter for changing CSV delimiter 
+    # Print parameter 
     print("The parameter is: delimiter\nExample: pd.read_csv('file.csv', delimiter=';')")
 
 def q6():
@@ -52,7 +49,7 @@ def q6():
     print(f"Column names: {list(df.columns)}")
 
 def q7():
-    # Search for a Pokémon by name
+    # Search for a Pokémon
     df = pd.read_csv(pokemon_file)
     name = input("Enter a Pokémon name: ")
     result = df[df["name"].str.lower() == name.lower()]
