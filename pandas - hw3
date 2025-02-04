@@ -1,0 +1,176 @@
+import pandas as pd
+import os
+
+# Data files
+data_path = "data/"
+pokemon_file = os.path.join(data_path, "pokemon.csv")
+regions_file = os.path.join(data_path, "regions.csv")
+locations_file = os.path.join(data_path, "locations.csv")
+
+def q1():
+    # list users and scores and convert to datframe
+    data = [
+        ("Zach", 20), ("Wyatt", 17), ("Carter", 48),
+        ("Cat", 92), ("Zyannah", 55), ("Dani", 63),
+        ("Tyler", 43), ("Jeremy", 23), ("Sam", 79),
+        ("Zane", 21)
+    ]
+    df = pd.DataFrame(data, columns=["Name", "Score"])
+    print(df["Name"].to_string(index=False))
+
+def q2_q4():
+    # Manage user scores
+    scores = pd.DataFrame(columns=["Name", "Score"])
+    while True:
+        print("\n1. Add Score\n2. Check Scores\n3. Show Total Scores\n4. Exit")
+        choice = input("Choose an option: ")
+        if choice == "1":
+            name = input("Enter player name: ")
+            score = input("Enter score: ")
+            scores = scores.append({"Name": name, "Score": int(score)}, ignore_index=True)
+        elif choice == "2":
+            name = input("Enter player name: ")
+            user_scores = scores[scores["Name"] == name]
+            print(user_scores if not user_scores.empty else "User does not exist")
+        elif choice == "3":
+            name = input("Enter player name: ")
+            if name not in scores["Name"].values:
+                print("User does not exist")
+            else:
+                print(f"Total score: {scores[scores['Name'] == name]['Score'].sum()}")
+        elif choice == "4":
+            break
+
+def q5():
+    # Print parameter for changing CSV delimiter 
+    print("The parameter is: delimiter\nExample: pd.read_csv('file.csv', delimiter=';')")
+
+def q6():
+    # Read pokemon.csv and print dataset summary
+    df = pd.read_csv(pokemon_file)
+    print(f"The pokemon dataset consists of {df.shape[1]} columns and {df.shape[0]} rows.")
+    print(f"Column names: {list(df.columns)}")
+
+def q7():
+    # Search for a Pokémon by name
+    df = pd.read_csv(pokemon_file)
+    name = input("Enter a Pokémon name: ")
+    result = df[df["name"].str.lower() == name.lower()]
+    print(result if not result.empty else "This pokemon does not exist.")
+
+def q8():
+    # Search for Pokémon by index or ID with validation (chatgpt helped with this one)
+    df = pd.read_csv(pokemon_file)
+    while True:
+        value = input("Enter a number: ")
+        if value.isdigit():
+            number = int(value)
+            break
+        else:
+            print("Please provide a number")
+            value = input("Enter a number again: ")
+            if not value.isdigit():
+                print("Error")
+                return
+    if number < len(df):
+        print(df.iloc[[number]])
+    else:
+        print("Index out of range")
+
+def q9():
+    # Pokémon team builder
+    df = pd.read_csv(pokemon_file)
+    team = []
+    while True:
+        print("\n1. Add To Team\n2. Drop From Team\n3. Print Team\n4. Exit")
+        choice = input("Choose an option: ")
+        if choice == "1":
+            if len(team) >= 6:
+                print("Too many team members")
+            else:
+                name = input("Enter Pokemon name: ")
+                if name not in df["name"].values:
+                    print("This pokemon does not exist")
+                else:
+                    team.append(name)
+        elif choice == "2":
+            name = input("Enter Pokemon to remove: ")
+            if name in team:
+                team.remove(name)
+        elif choice == "3":
+            print(pd.DataFrame(team, columns=["Team Members"]))
+        elif choice == "4":
+            break
+
+def q10():
+    # Count locations in a given region
+    regions = pd.read_csv(regions_file)
+    locations = pd.read_csv(locations_file)
+    region_name = input("Enter region name: ")
+    region = regions[regions["name"].str.lower() == region_name.lower()]
+    if region.empty:
+        print("This region does not exist")
+    else:
+        count = locations[locations["region_id"] == region["id"].values[0]].shape[0]
+        print(f"Number of locations: {count}")
+
+def q11():
+    # List locations not associated with a region
+    locations = pd.read_csv(locations_file)
+    unassociated = locations[locations["region_id"].isna()]
+    print(unassociated["name"])
+
+def q12():
+    # Ash's search tool for Pokémon and regions
+    regions = pd.read_csv(regions_file)
+    locations = pd.read_csv(locations_file)
+    df = pd.read_csv(pokemon_file)
+    while True:
+        print("\nHello, Ash!\n1) Search By Name\n2) Search By Region\n3) Exit")
+        choice = input("Choose an option: ")
+        if choice == "1":
+            name = input("Enter a Pokémon name: ")
+            result = df[df["name"].str.lower() == name.lower()]
+            print(result[["name", "id", "height", "weight"]] if not result.empty else "This mysterious pokemon cannot be found.")
+        elif choice == "2":
+            region_name = input("Enter a region name: ")
+            region = regions[regions["name"].str.lower() == region_name.lower()]
+            if region.empty:
+                print("This region does not exist")
+            else:
+                location_names = locations[locations["region_id"] == region["id"].values[0]]["name"]
+                print(location_names)
+        elif choice == "3":
+            break
+
+def main():
+    # Main menu to select tasks
+    while True:
+        print("\nMain Menu:")
+        print("1. Q1 - List Names")
+        print("2. Q2-Q4 - Score Tracker")
+        print("3. Q5 - Read CSV Delimiter")
+        print("4. Q6 - Pokemon Data Summary")
+        print("5. Q7 - Search Pokemon by Name")
+        print("6. Q8 - Search Pokemon by Number")
+        print("7. Q9 - Pokemon Team Builder")
+        print("8. Q10 - Count Locations in Region")
+        print("9. Q11 - List Unassociated Locations")
+        print("10. Q12 - Ash's Search Tool")
+        print("11. Exit")
+        choice = input("Choose an option: ")
+        if choice == "1": q1()
+        elif choice == "2": q2_q4()
+        elif choice == "3": q5()
+        elif choice == "4": q6()
+        elif choice == "5": q7()
+        elif choice == "6": q8()
+        elif choice == "7": q9()
+        elif choice == "8": q10()
+        elif choice == "9": q11()
+        elif choice == "10": q12()
+        elif choice == "11": break
+        else: print("Invalid")
+
+if __name__ == "__main__":
+    main()
